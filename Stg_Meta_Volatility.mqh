@@ -9,10 +9,10 @@
 
 // User input params.
 INPUT2_GROUP("Meta Volatility strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Normal = STRAT_RSI;       // Strategy for neutral volatility
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Normal = STRAT_ICHIMOKU;  // Strategy for neutral volatility
 INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong = STRAT_MA_TREND;  // Strategy for strong volatility
 INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong_Very =
-    STRAT_FORCE;  // Strategy for very strong volatility
+    STRAT_OSCILLATOR_RANGE;  // Strategy for very strong volatility
 INPUT2_GROUP("Meta Volatility strategy: common params");
 INPUT2 float Meta_Volatility_LotSize = 0;                // Lot size
 INPUT2 int Meta_Volatility_SignalOpenMethod = 0;         // Signal open method
@@ -32,8 +32,8 @@ INPUT2 float Meta_Volatility_OrderCloseLoss = 200;       // Order close loss
 INPUT2 float Meta_Volatility_OrderCloseProfit = 200;     // Order close profit
 INPUT2 int Meta_Volatility_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
 INPUT2_GROUP("Meta Volatility strategy: RSI oscillator params");
-INPUT2 int Meta_Volatility_RSI_Period = 14;                                    // Period
-INPUT2 ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
+INPUT2 int Meta_Volatility_RSI_Period = 8;                                     // Period
+INPUT2 ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
 INPUT2 int Meta_Volatility_RSI_Shift = 0;                                      // Shift
 INPUT2 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_RSI_SourceType = IDATA_BUILTIN;  // Source type
 INPUT2_GROUP("Meta Volatility: Volumes oscillator params");
