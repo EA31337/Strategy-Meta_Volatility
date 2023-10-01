@@ -9,12 +9,10 @@
 
 // User input params.
 INPUT2_GROUP("Meta Volatility strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Neutral =
-    STRAT_BANDS;  // Strategy for Volatility at neutral range (40-60)
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Peak =
-    STRAT_FORCE;  // Strategy for Volatility at peak range (0-20,80-100)
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Trend =
-    STRAT_AC;  // Strategy for Volatility at trend range (20-40,60-80)
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Normal = STRAT_RSI;       // Strategy for neutral volatility
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong = STRAT_MA_TREND;  // Strategy for strong volatility
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong_Very =
+    STRAT_FORCE;  // Strategy for very strong volatility
 INPUT2_GROUP("Meta Volatility strategy: common params");
 INPUT2 float Meta_Volatility_LotSize = 0;                // Lot size
 INPUT2 int Meta_Volatility_SignalOpenMethod = 0;         // Signal open method
@@ -25,7 +23,7 @@ INPUT2 int Meta_Volatility_SignalOpenBoostMethod = 0;    // Signal open boost me
 INPUT2 int Meta_Volatility_SignalCloseMethod = 0;        // Signal close method
 INPUT2 int Meta_Volatility_SignalCloseFilter = 32;       // Signal close filter (-127-127)
 INPUT2 float Meta_Volatility_SignalCloseLevel = 0;       // Signal close level
-INPUT2 int Meta_Volatility_PriceStopMethod = 0;          // Price limit method
+INPUT2 int Meta_Volatility_PriceStopMethod = 1;          // Price limit method
 INPUT2 float Meta_Volatility_PriceStopLevel = 2;         // Price limit level
 INPUT2 int Meta_Volatility_TickFilterMethod = 32;        // Tick filter method (0-255)
 INPUT2 float Meta_Volatility_MaxSpread = 4.0;            // Max spread to trade (in pips)
@@ -33,11 +31,15 @@ INPUT2 short Meta_Volatility_Shift = 0;                  // Shift
 INPUT2 float Meta_Volatility_OrderCloseLoss = 200;       // Order close loss
 INPUT2 float Meta_Volatility_OrderCloseProfit = 200;     // Order close profit
 INPUT2 int Meta_Volatility_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
-INPUT_GROUP("Meta Volatility strategy: RSI oscillator params");
-INPUT int Meta_Volatility_RSI_Period = 14;                                    // Period
-INPUT ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
-INPUT int Meta_Volatility_RSI_Shift = 0;                                      // Shift
-INPUT ENUM_IDATA_SOURCE_TYPE Meta_Volatility_RSI_SourceType = IDATA_BUILTIN;  // Source type
+INPUT2_GROUP("Meta Volatility strategy: RSI oscillator params");
+INPUT2 int Meta_Volatility_RSI_Period = 14;                                    // Period
+INPUT2 ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_TYPICAL;   // Applied Price
+INPUT2 int Meta_Volatility_RSI_Shift = 0;                                      // Shift
+INPUT2 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_RSI_SourceType = IDATA_BUILTIN;  // Source type
+INPUT2_GROUP("Meta Volatility: Volumes oscillator params");
+INPUT2 ENUM_APPLIED_VOLUME Meta_Volatility_VOL_InpVolumeType = VOLUME_TICK;    // Volumes
+INPUT2 int Meta_Volatility_VOL_Shift = 0;                                      // Shift
+INPUT2 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_VOL_SourceType = IDATA_BUILTIN;  // Source type
 
 // Structs.
 // Defines struct with default user strategy values.
@@ -80,17 +82,27 @@ class Stg_Meta_Volatility : public Strategy {
    * Event on strategy's init.
    */
   void OnInit() {
-    StrategyAdd(Meta_Volatility_Strategy_Volatility_Neutral, 0);
-    StrategyAdd(Meta_Volatility_Strategy_Volatility_Peak, 1);
-    StrategyAdd(Meta_Volatility_Strategy_Volatility_Trend, 2);
+    StrategyAdd(Meta_Volatility_Strategy_Volatility_Normal, 0);
+    StrategyAdd(Meta_Volatility_Strategy_Volatility_Strong, 1);
+    StrategyAdd(Meta_Volatility_Strategy_Volatility_Strong_Very, 2);
     // Initialize indicators.
-    {
-      IndiRSIParams _indi_params(::Meta_Volatility_RSI_Period, ::Meta_Volatility_RSI_Applied_Price,
-                                 ::Meta_Volatility_RSI_Shift);
-      _indi_params.SetDataSourceType(::Meta_Volatility_RSI_SourceType);
-      _indi_params.SetTf(PERIOD_D1);
-      SetIndicator(new Indi_RSI(_indi_params));
-    }
+    // Initialize RSI.
+    IndiRSIParams _indi_params0(::Meta_Volatility_RSI_Period, ::Meta_Volatility_RSI_Applied_Price,
+                                ::Meta_Volatility_RSI_Shift);
+    _indi_params0.SetDataSourceType(::Meta_Volatility_RSI_SourceType);
+    _indi_params0.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+    //_indi_params0.SetTf(PERIOD_D1);
+    SetIndicator(new Indi_RSI(_indi_params0), 0);
+    // Initialize Volumes.
+    IndiVolumesParams _indi_params1(::Meta_Volatility_VOL_InpVolumeType, ::Meta_Volatility_VOL_Shift);
+    _indi_params1.SetDataSourceType(::Meta_Volatility_VOL_SourceType);
+    _indi_params1.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+    //_indi_params1.SetTf(PERIOD_D1);
+    SetIndicator(new Indi_Volumes(_indi_params1), 1);
+    // Initialize RSI over Volumes.
+    IndicatorBase *_indi_rsi = GetIndicator(0);
+    IndicatorBase *_indi_vol = GetIndicator(1);
+    _indi_rsi.SetDataSource(_indi_vol);
   }
 
   /**
@@ -298,6 +310,45 @@ class Stg_Meta_Volatility : public Strategy {
   }
 
   /**
+   * Gets price stop value.
+   */
+  float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0f,
+                  short _bars = 4) {
+    float _result = 0;
+    if (_method == 0) {
+      // Ignores calculation when method is 0.
+      return (float)_result;
+    }
+    IndicatorBase *_indi = GetIndicator();
+    Ref<Strategy> _strat_ref;
+    uint _ishift = 0;
+    float _value = (float)_indi[_ishift][0];
+    if (_indi[_ishift][0] == 0) {
+      // @fixme
+      return false;
+    }
+    if (_indi[_ishift][0] <= 20 || _indi[_ishift][0] >= 80) {
+      // Volatility value is at peak range (0-20 or 80-100).
+      _strat_ref = strats.GetByKey(2);
+    } else if (_indi[_ishift][0] < 40 || _indi[_ishift][0] > 60) {
+      // Volatility value is at trend range (20-40 or 60-80).
+      _strat_ref = strats.GetByKey(1);
+    } else if (_indi[_ishift][0] > 40 && _indi[_ishift][0] < 60) {
+      // Volatility value is at neutral range (40-60).
+      _strat_ref = strats.GetByKey(0);
+    }
+    if (!_strat_ref.IsSet()) {
+      // Returns false when strategy is not set.
+      return false;
+    }
+    _level = _level == 0.0f ? _strat_ref.Ptr().Get<float>(STRAT_PARAM_SOL) : _level;
+    _method = _strat_ref.Ptr().Get<int>(STRAT_PARAM_SOM);
+    //_shift = _shift == 0 ? _strat_ref.Ptr().Get<int>(STRAT_PARAM_SHIFT) : _shift;
+    _result = _strat_ref.Ptr().PriceStop(_cmd, _mode, _method, _level /*, _shift*/);
+    return (float)_result;
+  }
+
+  /**
    * Check strategy's opening signal.
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
@@ -306,12 +357,17 @@ class Stg_Meta_Volatility : public Strategy {
     uint _ishift = _shift;
     IndicatorBase *_indi = GetIndicator();
     Ref<Strategy> _strat_ref;
+    float _value = (float)_indi[_ishift][0];
+    if (_indi[_ishift][0] == 0) {
+      // @fixme
+      return false;
+    }
     if (_indi[_ishift][0] <= 20 || _indi[_ishift][0] >= 80) {
       // Volatility value is at peak range (0-20 or 80-100).
-      _strat_ref = strats.GetByKey(1);
+      _strat_ref = strats.GetByKey(2);
     } else if (_indi[_ishift][0] < 40 || _indi[_ishift][0] > 60) {
       // Volatility value is at trend range (20-40 or 60-80).
-      _strat_ref = strats.GetByKey(2);
+      _strat_ref = strats.GetByKey(1);
     } else if (_indi[_ishift][0] > 40 && _indi[_ishift][0] < 60) {
       // Volatility value is at neutral range (40-60).
       _strat_ref = strats.GetByKey(0);
