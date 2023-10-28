@@ -14,33 +14,33 @@ INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong =
     STRAT_OSCILLATOR_DIVERGENCE;  // Strategy for strong volatility
 INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong_Very =
     STRAT_OSCILLATOR_RANGE;  // Strategy for very strong volatility
-INPUT2_GROUP("Meta Volatility strategy: common params");
-INPUT2 float Meta_Volatility_LotSize = 0;                // Lot size
-INPUT2 int Meta_Volatility_SignalOpenMethod = 0;         // Signal open method
-INPUT2 float Meta_Volatility_SignalOpenLevel = 0;        // Signal open level
-INPUT2 int Meta_Volatility_SignalOpenFilterMethod = 32;  // Signal open filter method
-INPUT2 int Meta_Volatility_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
-INPUT2 int Meta_Volatility_SignalOpenBoostMethod = 0;    // Signal open boost method
-INPUT2 int Meta_Volatility_SignalCloseMethod = 0;        // Signal close method
-INPUT2 int Meta_Volatility_SignalCloseFilter = 32;       // Signal close filter (-127-127)
-INPUT2 float Meta_Volatility_SignalCloseLevel = 0;       // Signal close level
-INPUT2 int Meta_Volatility_PriceStopMethod = 1;          // Price limit method
-INPUT2 float Meta_Volatility_PriceStopLevel = 2;         // Price limit level
-INPUT2 int Meta_Volatility_TickFilterMethod = 32;        // Tick filter method (0-255)
-INPUT2 float Meta_Volatility_MaxSpread = 4.0;            // Max spread to trade (in pips)
-INPUT2 short Meta_Volatility_Shift = 0;                  // Shift
-INPUT2 float Meta_Volatility_OrderCloseLoss = 200;       // Order close loss
-INPUT2 float Meta_Volatility_OrderCloseProfit = 200;     // Order close profit
-INPUT2 int Meta_Volatility_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
-INPUT2_GROUP("Meta Volatility strategy: RSI oscillator params");
-INPUT2 int Meta_Volatility_RSI_Period = 8;                                     // Period
-INPUT2 ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
-INPUT2 int Meta_Volatility_RSI_Shift = 0;                                      // Shift
-INPUT2 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_RSI_SourceType = IDATA_BUILTIN;  // Source type
-INPUT2_GROUP("Meta Volatility: Volumes oscillator params");
-INPUT2 ENUM_APPLIED_VOLUME Meta_Volatility_VOL_InpVolumeType = VOLUME_TICK;    // Volumes
-INPUT2 int Meta_Volatility_VOL_Shift = 0;                                      // Shift
-INPUT2 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_VOL_SourceType = IDATA_BUILTIN;  // Source type
+INPUT3_GROUP("Meta Volatility strategy: common params");
+INPUT3 float Meta_Volatility_LotSize = 0;                // Lot size
+INPUT3 int Meta_Volatility_SignalOpenMethod = 0;         // Signal open method
+INPUT3 float Meta_Volatility_SignalOpenLevel = 0;        // Signal open level
+INPUT3 int Meta_Volatility_SignalOpenFilterMethod = 32;  // Signal open filter method
+INPUT3 int Meta_Volatility_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
+INPUT3 int Meta_Volatility_SignalOpenBoostMethod = 0;    // Signal open boost method
+INPUT3 int Meta_Volatility_SignalCloseMethod = 0;        // Signal close method
+INPUT3 int Meta_Volatility_SignalCloseFilter = 32;       // Signal close filter (-127-127)
+INPUT3 float Meta_Volatility_SignalCloseLevel = 0;       // Signal close level
+INPUT3 int Meta_Volatility_PriceStopMethod = 1;          // Price limit method
+INPUT3 float Meta_Volatility_PriceStopLevel = 2;         // Price limit level
+INPUT3 int Meta_Volatility_TickFilterMethod = 32;        // Tick filter method (0-255)
+INPUT3 float Meta_Volatility_MaxSpread = 4.0;            // Max spread to trade (in pips)
+INPUT3 short Meta_Volatility_Shift = 0;                  // Shift
+INPUT3 float Meta_Volatility_OrderCloseLoss = 200;       // Order close loss
+INPUT3 float Meta_Volatility_OrderCloseProfit = 200;     // Order close profit
+INPUT3 int Meta_Volatility_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
+INPUT3_GROUP("Meta Volatility strategy: RSI oscillator params");
+INPUT3 int Meta_Volatility_RSI_Period = 8;                                     // Period
+INPUT3 ENUM_APPLIED_PRICE Meta_Volatility_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
+INPUT3 int Meta_Volatility_RSI_Shift = 0;                                      // Shift
+INPUT3 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_RSI_SourceType = IDATA_BUILTIN;  // Source type
+INPUT3_GROUP("Meta Volatility: Volumes oscillator params");
+INPUT3 ENUM_APPLIED_VOLUME Meta_Volatility_VOL_InpVolumeType = VOLUME_TICK;    // Volumes
+INPUT3 int Meta_Volatility_VOL_Shift = 0;                                      // Shift
+INPUT3 ENUM_IDATA_SOURCE_TYPE Meta_Volatility_VOL_SourceType = IDATA_BUILTIN;  // Source type
 
 // Structs.
 // Defines struct with default user strategy values.
