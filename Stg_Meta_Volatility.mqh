@@ -9,11 +9,10 @@
 
 // User input params.
 INPUT2_GROUP("Meta Volatility strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Normal = STRAT_ICHIMOKU;  // Strategy for neutral volatility
-INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong =
-    STRAT_OSCILLATOR_DIVERGENCE;  // Strategy for strong volatility
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Normal = STRAT_MA;          // Strategy for neutral volatility
+INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong = STRAT_STOCHASTIC;  // Strategy for strong volatility
 INPUT2 ENUM_STRATEGY Meta_Volatility_Strategy_Volatility_Strong_Very =
-    STRAT_OSCILLATOR_RANGE;  // Strategy for very strong volatility
+    STRAT_STDDEV;  // Strategy for very strong volatility
 INPUT3_GROUP("Meta Volatility strategy: common params");
 INPUT3 float Meta_Volatility_LotSize = 0;                // Lot size
 INPUT3 int Meta_Volatility_SignalOpenMethod = 0;         // Signal open method
